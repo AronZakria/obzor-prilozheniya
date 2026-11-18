@@ -71,8 +71,13 @@ NODE_OK=0
 if est node && [ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)" -ge 22 ]; then NODE_OK=1; echo "есть: $(node -v)"; fi
 if [ $NODE_OK = 0 ]; then
   NA="arm64"; [ "$ARCH" = "x86_64" ] && NA="x64"
-  F="$(curl -s https://nodejs.org/dist/latest-v22.x/SHASUMS256.txt | awk '{print $2}' | grep "darwin-$NA.tar.gz$" | head -1)"
-  if [ -n "$F" ] && curl -Ls "https://nodejs.org/dist/latest-v22.x/$F" | tar -xz -C "$NET"; then
+  B="https://nodejs.org/dist/latest-v22.x"
+  curl -fsS "$B/SHASUMS256.txt" -o "$NET/SHASUMS256.txt"
+  F="$(awk '{print $2}' "$NET/SHASUMS256.txt" 2>/dev/null | grep -E "^node-v22\.[0-9]+\.[0-9]+-darwin-$NA\.tar\.gz$" | head -1)"
+  # архив проверяется по контрольной сумме с сайта nodejs.org и только потом распаковывается
+  if [ -n "$F" ] && curl -fLs "$B/$F" -o "$NET/$F" \
+     && (cd "$NET" && grep " $F\$" SHASUMS256.txt | shasum -a 256 -c - >/dev/null) \
+     && tar -xzf "$NET/$F" -C "$NET"; then
     rm -rf "$L/node" && mv "$NET/${F%.tar.gz}" "$L/node" && echo "поставлен: $(node -v)"
   else MISSING+=("node"); fi
 fi
@@ -80,12 +85,12 @@ fi
 # 6. Запись экрана сайта (Playwright + Chromium) — в папке набора
 shag "Playwright и Chromium"
 if est npm; then
-  (cd "$N" && { [ -d node_modules/playwright ] || npm i --no-audit --no-fund -s playwright@1; } && npx -y playwright install chromium >/dev/null && echo "готово") || MISSING+=("playwright")
+  (cd "$N" && { [ -d node_modules/playwright ] || npm i --no-audit --no-fund -s playwright@1.65.1; } && npx -y playwright install chromium >/dev/null && echo "готово") || MISSING+=("playwright")
 fi
 
 # 7. HyperFrames (анимация из кода) — прогреть, чтобы первый запуск был быстрым
 shag "HyperFrames"
-if est npx; then npx -y hyperframes@latest --version 2>/dev/null && echo "готово" || echo "не прогрелся — не страшно, скачается при первом использовании"; fi
+if est npx; then npx -y hyperframes@0.9.67 --version 2>/dev/null && echo "готово" || echo "не прогрелся — не страшно, скачается при первом использовании"; fi
 
 # 8. Слежение за глазами и размытие (macOS Vision) — нужны инструменты разработчика
 shag "Программы на Swift (tools/build.sh)"

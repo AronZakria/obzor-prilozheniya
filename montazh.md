@@ -36,10 +36,11 @@ description: Монтаж рилсов из записей с телефона �
 
 1. **Запомни себя.** Скопируй этот файл как навык, если там нет копии или она старее: Codex — в `~/.agents/skills/montazh/SKILL.md`, Claude (Claude Code или вкладка Code в приложении Claude) — в `~/.claude/skills/montazh/SKILL.md`. Тогда в следующий раз в любом проекте хватит слов «сделай видео».
 2. **Набор для монтажа.** Если рядом с этим файлом лежит `ustanovka.sh`, набор здесь. Иначе скачай его в `~/obzor-prilozheniya` архивом (git может быть не установлен) и, если папка уже есть, обнови поверх:
-   `curl -Ls https://github.com/AronZakria/obzor-prilozheniya/archive/refs/heads/main.zip -o /tmp/obzor.zip && unzip -qo /tmp/obzor.zip -d /tmp && mkdir -p ~/obzor-prilozheniya && cp -R /tmp/obzor-prilozheniya-main/. ~/obzor-prilozheniya/`
+   `curl -Ls https://github.com/AronZakria/obzor-prilozheniya/archive/refs/heads/main.zip -o /tmp/obzor.zip && ditto -x -k /tmp/obzor.zip /tmp/ && mkdir -p ~/obzor-prilozheniya && cp -R /tmp/obzor-prilozheniya-main/. ~/obzor-prilozheniya/`
+   Распаковывай `ditto` (есть на любом Mac): обычный `unzip` ломается на русских именах файлов.
    Дальше `НАБОР` — эта папка. В ней скрипты монтажа, правила (`docs/`) и картинки форматов (`docs/форматы/`).
-3. **Запусти установку в фоне одной командой и не жди её:**
-   `cd ~/obzor-prilozheniya && nohup bash ustanovka.sh > ustanovka.log 2>&1 &`
+3. **Запусти установку и не жди её конца:** `cd ~/obzor-prilozheniya && bash ustanovka.sh 2>&1 | tee ustanovka.log`
+   Запускай как долгую команду, которая продолжает работать, пока ты разговариваешь (в Codex — команда в отдельной сессии, ответ не ждёт её конца). `nohup … &` внутри песочницы Codex может быть убит вместе с командой — не полагайся на него.
    Скрипт ставит всё без пароля от компьютера, в домашнюю папку, пропускает то, что уже есть, и идёт 10–30 минут.
 4. **Прочитай проект** (шаг 1) — быстро, за минуту.
 5. **Только теперь — первое сообщение человеку:** одна фраза, что происходит («Ставлю всё для монтажа, это займёт минут двадцать. Пока познакомимся»), и первый вопрос из шага 2.
