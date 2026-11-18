@@ -34,3 +34,8 @@ tools/ekran/okna
 монтаж/
 **/монтаж/
 Ролики/
+ustanovka.log
+env.sh
+node_modules/
+package.json
+package-lock.json
